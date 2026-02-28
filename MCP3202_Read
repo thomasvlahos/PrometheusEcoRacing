@@ -1,0 +1,63 @@
+/*
+ * Reads one channel from MCP3202 (12-bit ADC)
+ * channel: 0 or 1
+ * Returns: 12-bit value (0-4095)
+ * Add it in USER CODE BEGIN 0 (where local functions are stored
+ */
+uint16_t MCP3202_Read(uint8_t channel)
+{
+    uint8_t txBuffer[3];
+    uint8_t rxBuffer[3];
+    uint16_t adcValue;
+
+    /*
+     * MCP3202 Command format:
+     *
+     * Byte1:
+     *  Start bit = 1
+     *
+     *  0000 0001  -> Start bit
+     */
+
+    txBuffer[0] = 0x01;
+
+    /*
+     * Second byte:
+     * bit7 = SGL/DIFF = 1
+     * bit6 = ODD/SIGN = channel
+     * bit5 = MSBF
+     *
+     * So:
+     *  1100 0000 for channel 0
+     *  1110 0000 for channel 1
+     */
+
+    txBuffer[1] = (0x80 | (channel << 6));
+
+     /*
+     * Third byte: Dummy
+
+    txBuffer[2] = 0x00; // dummy byte
+
+    // Pull CS LOW
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+
+    // SPI transmit + receive 
+    // HAL_SPI_TransmitReceive(SPI_Peripheral, txBuffer, rxBuffer,Number Of Bytes,Timeout in ms)
+    HAL_SPI_TransmitReceive(&hspi1, txBuffer, rxBuffer, 3, 10);
+
+    // Pull CS HIGH
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+
+    /*
+     * Extract 12-bit result:
+     *
+     * rxBuffer[1] lower 4 bits
+     * rxBuffer[2] all 8 bits
+     * 0x0F = 0000 1111
+     */
+
+    adcValue = ((rxBuffer[1] & 0x0F) << 8) | rxBuffer[2];
+
+    return adcValue;
+}
