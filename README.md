@@ -2,7 +2,7 @@
 
 ## Table of Contents
 - [Subproject 1: SPI Communication MCP3202](#SPI_MCP3202)
-
+- [Subproject 2: SPI Communication CAN BUS](#CAN_BUS)
 
 ## Subprojects
 
@@ -15,4 +15,5 @@
 
 - Check https://github.com/thomasvlahos/PrometheusEcoRacing/blob/main/MCP3202_Read
 
+### CAN BUS
 
