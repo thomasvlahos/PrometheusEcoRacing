@@ -1,0 +1,134 @@
+/* USER CODE BEGIN Includes */
+#include <string.h>   // for memcpy
+/* USER CODE END Includes */
+
+
+/* USER CODE BEGIN PTD */
+
+typedef struct
+{
+    float value1;
+    float value2;
+} CAN_FloatPacket;
+
+/* USER CODE END PTD */
+
+
+/* USER CODE BEGIN 0 */
+
+void CAN_SendFloat(uint16_t stdID, float value1, float value2);
+CAN_FloatPacket CAN_ReadFloat(uint16_t expectedID);
+
+/* USER CODE END 0 */
+
+
+/* USER CODE BEGIN 2 */
+
+HAL_CAN_Start(&hcan);
+
+CAN_FilterTypeDef filterConfig;
+
+filterConfig.FilterBank = 0;
+filterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+filterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+filterConfig.FilterIdHigh = 0x0000;
+filterConfig.FilterIdLow = 0x0000;
+filterConfig.FilterMaskIdHigh = 0x0000;
+filterConfig.FilterMaskIdLow = 0x0000;
+filterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+filterConfig.FilterActivation = ENABLE;
+filterConfig.SlaveStartFilterBank = 14;
+
+HAL_CAN_ConfigFilter(&hcan, &filterConfig);
+
+/* USER CODE END 2 */
+
+
+/* USER CODE BEGIN 4 */
+
+/*
+ * Sends two floats (little endian) in one CAN frame (8 bytes total)
+ * stdID  : 11-bit standard CAN ID
+ * value1 : first float
+ * value2 : second float
+ */
+void CAN_SendFloat(uint16_t stdID, float value1, float value2)
+{
+    CAN_TxHeaderTypeDef txHeader;
+    uint8_t txData[8];
+    uint32_t txMailbox;
+
+    /* Configure CAN header */
+    txHeader.StdId = stdID;            // 11-bit ID
+    txHeader.ExtId = 0;                // Not used (standard frame)
+    txHeader.IDE = CAN_ID_STD;         // Standard ID
+    txHeader.RTR = CAN_RTR_DATA;       // Data frame
+    txHeader.DLC = 8;                  // 8 data bytes
+    txHeader.TransmitGlobalTime = DISABLE;
+
+    /*
+     * Copy floats into byte array.
+     * STM32 is little endian, so memcpy keeps correct byte order.
+     */
+    memcpy(&txData[0], &value1, 4);
+    memcpy(&txData[4], &value2, 4);
+
+    /* Send only if mailbox available */
+    if (HAL_CAN_GetTxMailboxesFreeLevel(&hcan) > 0)
+    {
+        HAL_CAN_AddTxMessage(&hcan, &txHeader, txData, &txMailbox);
+    }
+}
+
+/*
+ * Reads CAN frame with specific Standard ID
+ * Returns two floats directly inside struct
+ *
+ * If message not available or wrong ID,
+ * returns zeros (0.0f, 0.0f)
+ */
+CAN_FloatPacket CAN_ReadFloat(uint16_t expectedID)
+{
+    CAN_FloatPacket packet = {0.0f, 0.0f};  // default return
+
+    CAN_RxHeaderTypeDef rxHeader;
+    uint8_t rxData[8];
+
+    /* Check if message available in FIFO0 */
+    if (HAL_CAN_GetRxFifoFillLevel(&hcan, CAN_RX_FIFO0) > 0)
+    {
+        HAL_CAN_GetRxMessage(&hcan, CAN_RX_FIFO0, &rxHeader, rxData);
+
+        /* Check if correct Standard ID */
+        if (rxHeader.StdId == expectedID && rxHeader.DLC == 8)
+        {
+            /*
+             * Convert 8 received bytes into two floats
+             * STM32 is little endian, so memcpy restores correctly
+             */
+            memcpy(&packet.value1, &rxData[0], 4);
+            memcpy(&packet.value2, &rxData[4], 4);
+        }
+    }
+
+    return packet;
+}
+
+/* USER CODE END 4 */
+
+
+
+/* EXAMPLE 
+* float sensor1 = 3.14f;
+* float sensor2 = 2.71f;
+*
+* CAN_SendFloat(0x200, sensor1, sensor2);
+*
+*
+* CAN_FloatPacket received;
+*
+* received = CAN_ReadFloat(0x100);
+*
+* float a = received.value1;
+* float b = received.value2;
+*/
