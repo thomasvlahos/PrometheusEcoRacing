@@ -1,0 +1,46 @@
+/* USER CODE BEGIN Private defines */
+
+#define SERVO_MIN 500     // 0°  -> 500 μs
+#define SERVO_MAX 2500    // 180° -> 2500 μs
+
+/* USER CODE END Private defines */
+
+
+/* USER CODE BEGIN 0 */
+
+void Set_Servo_Angle(uint8_t angle);
+
+/* USER CODE END 0 */
+
+
+/* USER CODE BEGIN 2 */
+
+HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+
+/* USER CODE END 2 */
+
+/* USER CODE BEGIN 4 */
+
+void Set_Servo_Angle(uint8_t angle)
+{
+
+    uint32_t pulse = SERVO_MIN +
+                     ((SERVO_MAX - SERVO_MIN) * angle) / 180;
+
+    __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, pulse); /* CHECK */
+}
+
+/* USER CODE END 4 */
+
+
+/* Example
+*
+*   Set_Servo_Angle(0);
+*   HAL_Delay(1000);
+*
+*   Set_Servo_Angle(90);
+*   HAL_Delay(1000);
+*
+*   Set_Servo_Angle(180);
+*   HAL_Delay(1000);
+*/
