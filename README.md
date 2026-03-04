@@ -2,7 +2,8 @@
 
 ## Table of Contents
 - [Subproject 1: SPI Communication MCP3202](#SPI_MCP3202)
-- [Subproject 2: SPI Communication CAN BUS](#CAN_BUS)
+- [Subproject 2: CAN BUS Communication](#CAN_BUS)
+- [Subproject 3:SERVO CONTROL](#SERVO_CONTROL)
 
 ## Subprojects
 
@@ -27,3 +28,8 @@
 
 
 - Check https://github.com/thomasvlahos/PrometheusEcoRacing/blob/main/CAN%20Functions
+
+  ### SERVO CONTROL
+
+  <img width="773" height="810" alt="image" src="https://github.com/user-attachments/assets/cfa598a2-ae0a-45a4-855a-44292c6f15b3" />
+
