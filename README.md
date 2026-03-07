@@ -4,7 +4,8 @@
 - [Subproject 1: SPI Communication MCP3202](#SPI_MCP3202)
 - [Subproject 2: CAN BUS Communication](#CAN_BUS)
 - [Subproject 3:SERVO CONTROL](#SERVO_CONTROL)
-
+- [Subproject 3:I2C LCD Display and ADC](#I2C_LCD_Display_ADC)
+- 
 ## Subprojects
 
 ### SPI MCP3202
@@ -32,4 +33,9 @@
   ### SERVO CONTROL
 
   <img width="773" height="810" alt="image" src="https://github.com/user-attachments/assets/cfa598a2-ae0a-45a4-855a-44292c6f15b3" />
+
+  ### I2C LCD Display and ADC
+
+  <img width="717" height="364" alt="image" src="https://github.com/user-attachments/assets/9fe474d2-8e8e-4937-95ba-956b4b436b71" />
+
 
